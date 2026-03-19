@@ -32,40 +32,40 @@ async function fetchPage2(request: any) {
 // GROUP 1: AUTHENTICATION
 // ─────────────────────────────────────────────
 test.describe("AUTH | API Key Validation", () => {
-  test("AUTH-001 | Request tanpa API key harus return 401", async ({
+  test("AUTH-001 | Request without API key should return 401", async ({
     request,
   }) => {
     const response = await request.get(PAGE_2_URL);
-    expect(response.status()).toBe(403);
+    expect(response.status()).toBe(401);
   });
-
-  test("AUTH-002 | Request dengan API key yang salah harus return 401", async ({
+ 
+  test("AUTH-002 | Request with invalid API key should return 401", async ({
     request,
   }) => {
     const response = await request.get(PAGE_2_URL, {
       headers: { "x-api-key": "invalid_key_12345" },
     });
-    expect(response.status()).toBe(403);
+    expect(response.status()).toBe(401);
   });
-
-  test("AUTH-003 | Request dengan API key yang valid harus return 200", async ({
+ 
+  test("AUTH-003 | Request with valid API key should return 200", async ({
     request,
   }) => {
     const response = await request.get(PAGE_2_URL, { headers: AUTH_HEADERS });
     expect(response.status()).toBe(200);
   });
 });
-
+ 
 // ─────────────────────────────────────────────
 // GROUP 2: POSITIVE / HAPPY PATH
 // ─────────────────────────────────────────────
 test.describe("TC-001 ~ TC-005 | Positive & Happy Path", () => {
-  test("TC-001 | Status code harus 200", async ({ request }) => {
+  test("TC-001 | Status code should be 200", async ({ request }) => {
     const response = await request.get(PAGE_2_URL, { headers: AUTH_HEADERS });
     expect(response.status()).toBe(200);
   });
-
-  test("TC-001 | Response body harus memiliki field utama yang lengkap", async ({
+ 
+  test("TC-001 | Response body should contain all required fields", async ({
     request,
   }) => {
     const { body } = await fetchPage2(request);
@@ -78,8 +78,8 @@ test.describe("TC-001 ~ TC-005 | Positive & Happy Path", () => {
     expect(body.support).toHaveProperty("url");
     expect(body.support).toHaveProperty("text");
   });
-
-  test("TC-002 | Tipe data setiap field harus sesuai schema", async ({
+ 
+  test("TC-002 | Each field should have the correct data type", async ({
     request,
   }) => {
     const { body } = await fetchPage2(request);
@@ -91,8 +91,8 @@ test.describe("TC-001 ~ TC-005 | Positive & Happy Path", () => {
     expect(typeof body.support.url).toBe("string");
     expect(typeof body.support.text).toBe("string");
   });
-
-  test("TC-002 | Setiap user dalam data[] harus punya field id, email, first_name, last_name, avatar", async ({
+ 
+  test("TC-002 | Each user in data[] should have id, email, first_name, last_name, and avatar fields", async ({
     request,
   }) => {
     const { body } = await fetchPage2(request);
@@ -109,8 +109,8 @@ test.describe("TC-001 ~ TC-005 | Positive & Happy Path", () => {
       expect(typeof user.avatar).toBe("string");
     }
   });
-
-  test("TC-003 | Nilai pagination harus konsisten (page=2, per_page=6, total=12, total_pages=2)", async ({
+ 
+  test("TC-003 | Pagination values should be consistent (page=2, per_page=6, total=12, total_pages=2)", async ({
     request,
   }) => {
     const { body } = await fetchPage2(request);
@@ -120,8 +120,8 @@ test.describe("TC-001 ~ TC-005 | Positive & Happy Path", () => {
     expect(body.total_pages).toBe(2);
     expect(body.data).toHaveLength(body.per_page);
   });
-
-  test("TC-003 | User di page=2 tidak boleh overlap dengan page=1", async ({
+ 
+  test("TC-003 | Users on page=2 should not overlap with page=1", async ({
     request,
   }) => {
     const res1 = await request.get(`${BASE_URL}?page=1`, {
@@ -132,21 +132,21 @@ test.describe("TC-001 ~ TC-005 | Positive & Happy Path", () => {
     });
     const body1 = await res1.json();
     const body2 = await res2.json();
-
+ 
     const ids1 = body1.data.map((u: any) => u.id);
     const ids2 = body2.data.map((u: any) => u.id);
     const overlap = ids1.filter((id: number) => ids2.includes(id));
     expect(overlap).toHaveLength(0);
   });
-
-  test("TC-004 | Response time harus di bawah 2000ms", async ({ request }) => {
+ 
+  test("TC-004 | Response time should be under 2000ms", async ({ request }) => {
     const start = Date.now();
     await request.get(PAGE_2_URL, { headers: AUTH_HEADERS });
     const duration = Date.now() - start;
     expect(duration).toBeLessThan(2000);
   });
-
-  test("TC-005 | Content-Type header harus application/json", async ({
+ 
+  test("TC-005 | Content-Type header should be application/json", async ({
     request,
   }) => {
     const response = await request.get(PAGE_2_URL, { headers: AUTH_HEADERS });
@@ -154,12 +154,12 @@ test.describe("TC-001 ~ TC-005 | Positive & Happy Path", () => {
     expect(contentType).toContain("application/json");
   });
 });
-
+ 
 // ─────────────────────────────────────────────
 // GROUP 3: DATA INTEGRITY
 // ─────────────────────────────────────────────
 test.describe("TC-013 ~ TC-014 | Data Integrity & Reliability", () => {
-  test("TC-013 | Avatar URL setiap user harus valid (https://)", async ({
+  test("TC-013 | Avatar URL for each user should be valid (https://)", async ({
     request,
   }) => {
     const { body } = await fetchPage2(request);
@@ -167,8 +167,8 @@ test.describe("TC-013 ~ TC-014 | Data Integrity & Reliability", () => {
       expect(user.avatar).toMatch(/^https:\/\/.+/);
     }
   });
-
-  test("TC-013 | Email setiap user harus berformat valid", async ({
+ 
+  test("TC-013 | Email for each user should have a valid format", async ({
     request,
   }) => {
     const { body } = await fetchPage2(request);
@@ -177,8 +177,8 @@ test.describe("TC-013 ~ TC-014 | Data Integrity & Reliability", () => {
       expect(user.email).toMatch(emailRegex);
     }
   });
-
-  test("TC-014 | Response harus idempotent (3 request berturut-turut hasilnya sama)", async ({
+ 
+  test("TC-014 | Response should be idempotent (3 consecutive requests return the same result)", async ({
     request,
   }) => {
     const results = await Promise.all([
@@ -186,18 +186,18 @@ test.describe("TC-013 ~ TC-014 | Data Integrity & Reliability", () => {
       fetchPage2(request),
       fetchPage2(request),
     ]);
-
+ 
     const [first, second, third] = results.map((r) => r.body);
     expect(JSON.stringify(first.data)).toBe(JSON.stringify(second.data));
     expect(JSON.stringify(second.data)).toBe(JSON.stringify(third.data));
   });
 });
-
+ 
 // ─────────────────────────────────────────────
 // GROUP 4: EDGE CASES & BOUNDARY
 // ─────────────────────────────────────────────
 test.describe("TC-006 ~ TC-011 | Edge Cases & Boundary", () => {
-  test("TC-006 | Request tanpa query param page harus return page=1 secara default", async ({
+  test("TC-006 | Request without page param should default to page=1", async ({
     request,
   }) => {
     const response = await request.get(BASE_URL, { headers: AUTH_HEADERS });
@@ -205,8 +205,8 @@ test.describe("TC-006 ~ TC-011 | Edge Cases & Boundary", () => {
     const body = await response.json();
     expect(body.page).toBe(1);
   });
-
-  test("TC-007 | Request dengan page=0 tidak boleh crash (status bukan 5xx)", async ({
+ 
+  test("TC-007 | Request with page=0 should not crash (status not 5xx)", async ({
     request,
   }) => {
     const response = await request.get(`${BASE_URL}?page=0`, {
@@ -216,8 +216,8 @@ test.describe("TC-006 ~ TC-011 | Edge Cases & Boundary", () => {
     const body = await response.json();
     expect(body).toHaveProperty("data");
   });
-
-  test("TC-008 | Request dengan page=999 harus return data array kosong", async ({
+ 
+  test("TC-008 | Request with page=999 should return an empty data array", async ({
     request,
   }) => {
     const response = await request.get(`${BASE_URL}?page=999`, {
@@ -228,8 +228,8 @@ test.describe("TC-006 ~ TC-011 | Edge Cases & Boundary", () => {
     expect(Array.isArray(body.data)).toBe(true);
     expect(body.data).toHaveLength(0);
   });
-
-  test("TC-009 | Request dengan page=-1 tidak boleh crash (status bukan 5xx)", async ({
+ 
+  test("TC-009 | Request with page=-1 should not crash (status not 5xx)", async ({
     request,
   }) => {
     const response = await request.get(`${BASE_URL}?page=-1`, {
@@ -237,8 +237,8 @@ test.describe("TC-006 ~ TC-011 | Edge Cases & Boundary", () => {
     });
     expect(response.status()).toBeLessThan(500);
   });
-
-  test("TC-010 | Request dengan page=abc (non-numerik) tidak boleh 500", async ({
+ 
+  test("TC-010 | Request with page=abc (non-numeric) should not return 500", async ({
     request,
   }) => {
     const response = await request.get(`${BASE_URL}?page=abc`, {
@@ -248,8 +248,8 @@ test.describe("TC-006 ~ TC-011 | Edge Cases & Boundary", () => {
     const body = await response.json();
     expect(body).toHaveProperty("data");
   });
-
-  test("TC-011 | Parameter ekstra yang tidak dikenal harus diabaikan", async ({
+ 
+  test("TC-011 | Unknown extra parameters should be ignored", async ({
     request,
   }) => {
     const response = await request.get(`${BASE_URL}?page=2&foo=bar&baz=123`, {
@@ -261,20 +261,22 @@ test.describe("TC-006 ~ TC-011 | Edge Cases & Boundary", () => {
     expect(body.data).toHaveLength(6);
   });
 });
-
+ 
 // ─────────────────────────────────────────────
 // GROUP 5: WRONG METHOD
 // ─────────────────────────────────────────────
 test.describe("TC-012 | Wrong HTTP Method", () => {
-  test("TC-012 | POST ke endpoint ini tidak boleh 5xx", async ({ request }) => {
+  test("TC-012 | POST to this endpoint should not return 5xx", async ({
+    request,
+  }) => {
     const response = await request.post(PAGE_2_URL, {
       headers: AUTH_HEADERS,
       data: {},
     });
     expect(response.status()).toBeLessThan(500);
   });
-
-  test("TC-012 | DELETE ke endpoint ini tidak boleh 5xx", async ({
+ 
+  test("TC-012 | DELETE to this endpoint should not return 5xx", async ({
     request,
   }) => {
     const response = await request.delete(PAGE_2_URL, {
@@ -283,3 +285,28 @@ test.describe("TC-012 | Wrong HTTP Method", () => {
     expect(response.status()).toBeLessThan(500);
   });
 });
+ 
+// ─────────────────────────────────────────────
+// GROUP 6: HEADER VALIDATION
+// ─────────────────────────────────────────────
+test.describe("TC-015 | Header Validation", () => {
+  test("TC-015 | Request with Accept: application/json should still return JSON", async ({
+    request,
+  }) => {
+    const response = await request.get(PAGE_2_URL, {
+      headers: { ...AUTH_HEADERS, Accept: "application/json" },
+    });
+    expect(response.status()).toBe(200);
+    const contentType = response.headers()["content-type"];
+    expect(contentType).toContain("application/json");
+  });
+ 
+  test("TC-015 | Response should contain a content-type header", async ({
+    request,
+  }) => {
+    const response = await request.get(PAGE_2_URL, { headers: AUTH_HEADERS });
+    const headers = response.headers();
+    expect(headers["content-type"]).toBeDefined();
+  });
+});
+ 
