@@ -1,10 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
-
-const API_URL = "https://reqres.in/api/users?page=2";
 import * as dotenv from "dotenv";
 dotenv.config();
 
+const API_URL = "https://reqres.in/api/users?page=2";
 const API_KEY = process.env.REQRES_API_KEY || "";
 const OUTPUT_FILE = path.join(__dirname, "users_page2.csv");
 

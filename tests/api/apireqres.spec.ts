@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 /**
  * API Automation Tests — GET https://reqres.in/api/users?page=2
@@ -11,11 +13,7 @@ import { test, expect } from "@playwright/test";
 
 const BASE_URL = "https://reqres.in/api/users";
 const PAGE_2_URL = `${BASE_URL}?page=2`;
-import * as dotenv from "dotenv";
-dotenv.config();
-
 const API_KEY = process.env.REQRES_API_KEY || "";
-
 const AUTH_HEADERS = {
   "x-api-key": API_KEY,
   "Content-Type": "application/json",
