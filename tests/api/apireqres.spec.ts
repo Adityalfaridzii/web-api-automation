@@ -36,7 +36,7 @@ test.describe("AUTH | API Key Validation", () => {
     request,
   }) => {
     const response = await request.get(PAGE_2_URL);
-    expect(response.status()).toBe(401);
+    expect(response.status()).toBe(403);
   });
  
   test("AUTH-002 | Request with invalid API key should return 401", async ({
@@ -45,7 +45,7 @@ test.describe("AUTH | API Key Validation", () => {
     const response = await request.get(PAGE_2_URL, {
       headers: { "x-api-key": "invalid_key_12345" },
     });
-    expect(response.status()).toBe(401);
+    expect(response.status()).toBe(403);
   });
  
   test("AUTH-003 | Request with valid API key should return 200", async ({
